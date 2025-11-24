@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>memo - k</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <h1>Memok</h1>
+      <input type="text" @keyup.enter="Add" v-model="input" />
+      <button @click="Add">Add</button>
+
+      <ul id="lists">
+        <li
+          v-for="item in items"
+          :key="item.id"
+          :class="{ checked: item.checked }"
+        >
+          {{ item.text }}
+          <input type="checkbox" v-model="item.checked" />
+          <button @click="Del(item.id)">Delete</button>
+        </li>
+      </ul>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script>
+      const { createApp, ref, onMounted, watch } = Vue;
+
+      createApp({
+        setup() {
+          const input = ref("");
+          const items = ref([{ id: 1, text: "Learn Vue.js", checked: false }]);
+
+          const Del = (id) => {
+            items.value = items.value.filter((item) => item.id !== id);
+          };
+          const Add = () => {
+            if (input.value.trim() === "") return;
+            items.value.push({
+              id: Date.now(), // 唯一 key
+              text: input.value,
+              checked: false,
+            });
+            input.value = "";
+          };
+          onMounted(() => {
+            const saved = localStorage.getItem("memo-items");
+            if (saved) {
+              items.value = JSON.parse(saved);
+            }
+
+            new Sortable(document.getElementById("lists"), {
+              animation: 150,
+              ghostClass: "sortable-ghost",
+              onEnd: (evt) => {
+                const movedItem = items.value.splice(evt.oldIndex, 1)[0];
+                items.value.splice(evt.newIndex, 0, movedItem);
+              },
+            });
+            console.log("组件挂载完毕");
+          });
+          watch(
+            items,
+            (newItems, oldItems) => {
+              localStorage.setItem("memo-items", JSON.stringify(items.value));
+              console.log("changed to", newItems, "from", oldItems);
+            },
+            { deep: true }
+          );
+          return { input, items, Add, Del };
+        },
+      }).mount("#app");
+    </script>
+    <style>
+      body {
+        font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+        background: #f5f6fa;
+        margin: 0;
+        padding: 40px 0;
+        display: flex;
+        justify-content: center;
+      }
+
+      #app {
+        width: 420px;
+        background: #fff;
+        padding: 30px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      }
+
+      h1 {
+        margin-top: 0;
+        text-align: center;
+        letter-spacing: 1px;
+      }
+
+      .input-row {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      li {
+        background: #f1f2f6;
+        padding: 12px 14px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .checked {
+        text-decoration: line-through;
+        opacity: 0.6;
+      }
+
+      button {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: none;
+        background: #2e86de;
+        color: white;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #1e6fbf;
+      }
+    </style>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1 id="title">hello,{{name}}</h1>
+
+      <input
+        id="shuru"
+        v-model="name"
+        type="text"
+        placeholder="Type something..."
+      />
+
+      <h2>{{name}}</h2>
+      <h2>{{name}}</h2>
+      <h2>{{upperName}}</h2>
+      <button @click="method">Click me</button>
+    </div>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+
+    <script>
+      const { createApp, ref, computed, onMounted } = Vue;
+      createApp({
+        setup() {
+          const name = ref("gouzi");
+          const method = () => {
+            console.log("method 执行了");
+          };
+          const upperName = computed(() => {
+            return name.value.toUpperCase();
+          });
+          onMounted(() => {
+            console.log("组件挂载完毕");
+          });
+          return { name, method, upperName };
+        },
+      }).mount("#app");
+    </script>
+  </body>
+</html>

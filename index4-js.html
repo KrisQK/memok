@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h1 id="title">hello,</h1>
+
+    <input id="shuru" type="text" placeholder="Type something..." />
+
+    <script>
+      const title = document.getElementById("title");
+      const input = document.getElementById("shuru");
+
+      input.addEventListener("input", () => {
+        title.textContent = "hello, " + input.value;
+      });
+    </script>
+  </body>
+</html>
